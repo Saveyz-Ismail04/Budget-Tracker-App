@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sultan's Treasury v5.0</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: linear-gradient(135deg, #04060c 0%, #0c0c1b 100%); color: #f8fafc; padding: 20px; min-height: 100vh; }
+        
+        .main-wrapper { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+        
+        /* Header Custom Matrix */
+        header { background: #10102b; border: 1px solid #1f1f45; padding: 24px; border-radius: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        h1 { font-size: 26px; font-weight: 800; background: linear-gradient(to right, #38bdf8, #fbbf24, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sub-heading { font-size: 11px; color: #818cf8; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+        
+        /* Timeline Dropdown Jumper */
+        .time-travel-box { display: flex; align-items: center; gap: 10px; background: #070714; padding: 8px 16px; border-radius: 14px; border: 1px solid #1c1c3f; }
+        .month-dropdown { background: transparent; border: none; color: #fbbf24; font-weight: 700; font-size: 14px; outline: none; cursor: pointer; width: auto; }
+        
+        /* Dashboard Summary Highlight Cards */
+        .metrics-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .metric-card { padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.04); }
+        .m-inflow { background: linear-gradient(135deg, #064e3b 0%, #01241b 100%); border-color: #10b981; }
+        .m-outflow { background: linear-gradient(135deg, #4c0519 0%, #170107 100%); border-color: #f43f5e; }
+        .m-reserve { background: linear-gradient(135deg, #1e3a8a 0%, #0b1121 100%); border-color: #3b82f6; }
+        .m-vault { background: linear-gradient(135deg, #78350f 0%, #291305 100%); border-color: #d97706; box-shadow: 0 0 15px rgba(217,119,6,0.15); }
+        .m-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #cbd5e1; }
+        .m-val { font-size: 26px; font-weight: 800; margin-top: 8px; font-family: monospace; }
+        
+        /* Operational Workspace Grid */
+        .workspace-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        @media(min-width: 950px) { .workspace-grid { grid-template-columns: 1fr 1fr 1fr; } }
+        
+        .content-panel { background: #10102a; border: 1px solid #1c1c3c; padding: 24px; border-radius: 22px; display: flex; flex-direction: column; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .panel-header-title { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #94a3b8; border-bottom: 2px solid #1c1c3c; padding-bottom: 10px; letter-spacing: 0.5px; }
+        
+        /* Text inputs forms architecture */
+        .input-stack { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: #64748b; }
+        input, select { background: #06060f; border: 1px solid #222244; padding: 10px 14px; border-radius: 10px; color: #fff; font-size: 13px; outline: none; width: 100%; transition: border-color 0.2s; }
+        input:focus, select:focus { border-color: #6366f1; }
+        
+        .action-button { background: #4f46e5; color: #fff; font-weight: 700; font-size: 11px; text-transform: uppercase; padding: 12px; border: none; border-radius: 10px; cursor: pointer; transition: background 0.2s; text-align: center; width: 100%; letter-spacing: 0.5px; }
+        .action-button:hover { background: #4338ca; }
+        .btn-green { background: #10b981; } .btn-green:hover { background: #059669; }
+        .btn-gold { background: #d97706; } .btn-gold:hover { background: #b45309; }
+        
+        /* Safe Administration Overrides Buttons */
+        .btn-clear-period { background: transparent; border: 1px dashed #ef4444; color: #f87171; }
+        .btn-clear-period:hover { background: rgba(239,68,68,0.1); }
+        .btn-master-purge { background: rgba(220,38,38,0.2); border: 1px solid #dc2626; color: #fca5a5; }
+        .btn-master-purge:hover { background: #dc2626; color: #fff; }
+        
+        /* Autonomous Advisor Blocks Layout */
+        .advice-wrapper { display: flex; flex-direction: column; gap: 12px; }
+        .advice-msg { padding: 12px 14px; border-radius: 12px; font-size: 12px; line-height: 1.6; border: 1px solid transparent; }
+        .msg-danger { background: rgba(244, 63, 94, 0.12); color: #fca5a5; border-color: rgba(244, 63, 94, 0.25); }
+        .msg-warning { background: rgba(245, 158, 11, 0.12); color: #fde047; border-color: rgba(245, 158, 11, 0.25); }
+        .msg-stable { background: rgba(16, 185, 129, 0.12); color: #86efac; border-color: rgba(16, 185, 129, 0.25); }
+        .msg-insight { background: rgba(99, 102, 241, 0.15); color: #cbd5e1; border-color: rgba(99, 102, 241, 0.3); margin-top: 4px; }
+        
+        /* Projection Layout Row Configurations */
+        .forecast-row { background: #05050f; padding: 12px 14px; border-radius: 12px; border: 1px solid #1a1a38; display: flex; justify-content: space-between; align-items: center; }
+        .forecast-lbl { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+        .forecast-num { font-size: 14px; font-weight: 800; font-family: monospace; }
+        
+        /* Ledger Tables Registry */
+        .ledger-box { background: #10102a; border: 1px solid #1c1c3c; border-radius: 24px; padding: 24px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { padding: 14px; color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700; border-bottom: 2px solid #1c1c3c; }
+        td { padding: 14px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        
+        .tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; display: inline-block; border: 1px solid transparent; }
+        .t-essentials { background: rgba(59, 130, 246, 0.1); color: #93c5fd; border-color: rgba(59, 130, 246, 0.2); }
+        .t-lifestyle { background: rgba(245, 158, 11, 0.1); color: #fde047; border-color: rgba(245, 158, 11, 0.2); }
+        .t-subscriptions { background: rgba(168, 85, 247, 0.1); color: #e9d5ff; border-color: rgba(168, 85, 247, 0.2); }
+        .t-investments { background: rgba(16, 185, 129, 0.1); color: #a7f3d0; border-color: rgba(16, 185, 129, 0.2); }
+        
+        .clear-action { color: #f43f5e; background: none; border: none; font-weight: 700; cursor: pointer; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <!-- Dashboard Navigation Header -->
+        <header>
+            <div>
+                <h1>Sultan's Treasury</h1>
+                <div class="sub-heading">Global Ledger & Sandbox Validation System</div>
+            </div>
+            
+            <div class="time-travel-box">
+                <label style="color: #64748b; margin-right: 5px;">Active Period:</label>
+                <select id="active-month-select" class="month-dropdown" onchange="switchMonthTimeline()">
+                    <!-- Rendered natively by JS -->
+                </select>
+            </div>
+        </header>
+
+        <!-- Metric Cards View Layout Panels -->
+        <div class="metrics-container">
+            <div class="metric-card m-inflow">
+                <div class="m-label" style="color: #a7f3d0;">Active Period Inflow</div>
+                <div class="m-val" id="sum-inflow" style="color: #34d399;">0 PKR</div>
+            </div>
+            <div class="metric-card m-outflow">
+                <div class="m-label" style="color: #fecdd3;">Active Period Outflow</div>
+                <div class="m-val" id="sum-outflow" style="color: #f43f5e;">0 PKR</div>
+            </div>
+            <div class="metric-card m-reserve">
+                <div class="m-label" style="color: #bfdbfe;">Liquid Available Budget</div>
+                <div class="m-val" id="sum-net" style="color: #60a5fa;">0 PKR</div>
+            </div>
+            <div class="metric-card m-vault">
+                <div class="m-label" style="color: #fde68a;">The Imperial Vault (Total Savings)</div>
+                <div class="m-val" id="sum-vault" style="color: #fbbf24;">0 PKR</div>
+            </div>
+        </div>
+
+        <!-- Master Interface Operations Row -->
+        <div class="workspace-grid">
+            
+            <!-- Panel 1: Data Ingestion Inputs -->
+            <div class="content-panel">
+                <div class="panel-header-title">Data Entry & Architecture</div>
+                
+                <!-- Period Creation Box -->
+                <div class="input-stack" style="background: rgba(255,255,255,0.01); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.02);">
+                    <label>Create New Billing Month</label>
+                    <div style="display: flex; gap: 6px; margin-top: 4px;">
+                        <input type="text" id="new-month-title" placeholder="e.g., June 2026">
+                        <button class="action-button" style="width: auto; padding: 0 14px;" onclick="createNewMonthSession()">Create</button>
+                    </div>
+                </div>
+
+                <!-- Active Intake Allocation Inputs -->
+                <div class="input-stack">
+                    <label>Define Active Month Salary / Inflow</label>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="number" id="income-field" placeholder="Salary Amount in PKR">
+                        <button class="action-button btn-green" style="width: auto; padding: 0 14px;" onclick="setMonthIncome()">Set</button>
+                    </div>
+                </div>
+
+                <!-- Vault Resource Route Transits -->
+                <div class="input-stack" style="border-top: 1px dashed #1e1e3f; margin-top: 5px; padding-top: 10px;">
+                    <label style="color: #fbbf24;">Route Liquidity directly to Vault</label>
+                    <div style="display: flex; gap: 6px; margin-top: 4px;">
+                        <input type="number" id="vault-field" placeholder="Amount to tuck away">
+                        <button class="action-button btn-gold" style="width: auto; padding: 0 14px;" onclick="depositToVaultAccount()">Lock</button>
+                    </div>
+                </div>
+
+                <!-- Expense Input Form Fields -->
+                <div class="input-stack" style="border-top: 1px dashed #1e1e3f; padding-top: 10px; margin-top: 5px;">
+                    <label>Log Outflow Expense</label>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;">
+                        <input type="text" id="expense-title" placeholder="Item Name (e.g., Shoes)">
+                        <input type="number" id="expense-cost" placeholder="Cost in PKR">
+                        <select id="expense-group">
+                            <option value="Essentials">Essentials (Fixed Bills, Food)</option>
+                            <option value="Lifestyle">Lifestyle (Shopping, Luxury)</option>
+                            <option value="Subscriptions">Subscriptions (Software, Apps)</option>
+                            <option value="Investments">Savings & Future Assets</option>
+                        </select>
+                        <button class="action-button" onclick="commitExpenseLog()">Log Outflow</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 2: Advisory Engines Matrix & System Reset Panel -->
+            <div class="content-panel">
+                <div class="panel-header-title">Autonomous Strategic Matrix</div>
+                <div id="advice-output-panel" class="advice-wrapper" style="flex-grow: 1;">
+                    <!-- Managed via runtime loops -->
+                </div>
+
+                <!-- NEW COMPONENT: System Administration Purge Panel -->
+                <div style="border-top: 1px solid #1c1c3c; padding-top: 15px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+                    <label style="color: #f87171; font-weight: 800;">Sandbox Cleansing Controls</label>
+                    <button class="action-button btn-clear-period" onclick="clearCurrentMonthSandbox()">Clear Current Month Data</button>
+                    <button class="action-button btn-master-purge" onclick="executeMasterGlobalReset()">Global System Reset (Wipe All)</button>
+                </div>
+            </div>
+
+            <!-- Panel 3: Run Rate Timelines Forecasting -->
+            <div class="content-panel">
+                <div class="panel-header-title">Context Target Forecast Projections</div>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="forecast-row" style="border-left: 4px solid #3b82f6; background: rgba(59, 130, 246, 0.01);">
+                        <div class="forecast-lbl" style="color: #60a5fa;">Active Month Budget Run-Rate</div>
+                        <div class="forecast-num" id="row-m-report" style="color: #60a5fa;">0 PKR</div>
+                    </div>
+                    <div class="forecast-row" style="border-left: 4px solid #c084fc;">
+                        <div class="forecast-lbl">Quarterly Trajectory (3M)</div>
+                        <div class="forecast-num" id="row-q-report">0 PKR</div>
+                    </div>
+                    <div class="forecast-row" style="border-left: 4px solid #f472b6;">
+                        <div class="forecast-lbl">Semi-Annual Trajectory (6M)</div>
+                        <div class="forecast-num" id="row-s-report">0 PKR</div>
+                    </div>
+                    <div class="forecast-row" style="border-left: 4px solid #d97706; background: rgba(217,119,6,0.01);">
+                        <div class="forecast-lbl" style="color: #fbbf24;">Annual System Projections (12M)</div>
+                        <div class="forecast-num" id="row-a-report" style="color: #fbbf24;">0 PKR</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Section: Itemized Ledger Tables Registry -->
+        <div class="ledger-box">
+            <div class="panel-header-title" style="margin-bottom: 16px;">Itemized Period Registries</div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Transaction Context</th>
+                            <th>Classification Signature</th>
+                            <th style="text-align: right;">Outflow Volume</th>
+                            <th style="text-align: center;">Registry Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="registry-table-body">
+                        <!-- Native loading strings append here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Database Application Scripts Engines -->
+    <script>
+        // Production State Variable Layout
+        const baselineDefaultDatabase = {
+            activeMonth: "May 2026",
+            vaultTotal: 0,
+            months: {
+                "May 2026": { income: 0, expenses: [], vaultAllocations: 0 }
+            }
+        };
+
+        let globalDatabase = JSON.parse(JSON.stringify(baselineDefaultDatabase));
+
+        window.onload = function() {
+            const memoryData = localStorage.getItem('sultan_v5_vault_core');
+            if (memoryData) {
+                globalDatabase = JSON.parse(memoryData);
+            }
+            
+            setupEnterKeyListeners();
+            syncMonthDropdownOptions();
+            evaluateAndRenderView();
+        };
+
+        function writeStateToDisk() {
+            localStorage.setItem('sultan_v5_vault_core', JSON.stringify(globalDatabase));
+        }
+
+        function setupEnterKeyListeners() {
+            const inputs = ['expense-title', 'expense-cost', 'expense-group'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); commitExpenseLog(); }
+                });
+            });
+            
+            document.getElementById('income-field').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); setMonthIncome(); }
+            });
+
+            document.getElementById('vault-field').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); depositToVaultAccount(); }
+            });
+        }
+
+        function syncMonthDropdownOptions() {
+            const selectEl = document.getElementById('active-month-select');
+            selectEl.innerHTML = '';
+            
+            Object.keys(globalDatabase.months).forEach(monthKey => {
+                const opt = document.createElement('option');
+                opt.value = monthKey;
+                opt.innerText = monthKey;
+                if(monthKey === globalDatabase.activeMonth) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        function createNewMonthSession() {
+            const input = document.getElementById('new-month-title');
+            const newMonthName = input.value.trim();
+            if(newMonthName === "") return;
+
+            if (!globalDatabase.months[newMonthName]) {
+                globalDatabase.months[newMonthName] = { income: 0, expenses: [], vaultAllocations: 0 };
+            }
+
+            globalDatabase.activeMonth = newMonthName;
+            writeStateToDisk();
+            syncMonthDropdownOptions();
+            evaluateAndRenderView();
+            input.value = '';
+        }
+
+        function switchMonthTimeline() {
+            const selectEl = document.getElementById('active-month-select');
+            globalDatabase.activeMonth = selectEl.value;
+            writeStateToDisk();
+            evaluateAndRenderView();
+        }
+
+        function setMonthIncome() {
+            const input = document.getElementById('income-field');
+            const val = parseFloat(input.value);
+            if(!isNaN(val) && val >= 0) {
+                globalDatabase.months[globalDatabase.activeMonth].income = Math.trunc(val);
+                writeStateToDisk();
+                evaluateAndRenderView();
+                input.value = '';
+            }
+        }
+
+        function depositToVaultAccount() {
+            const input = document.getElementById('vault-field');
+            const val = parseFloat(input.value);
+            if(!isNaN(val) && val > 0) {
+                let currentContext = globalDatabase.months[globalDatabase.activeMonth];
+                globalDatabase.vaultTotal += Math.trunc(val);
+                currentContext.vaultAllocations += Math.trunc(val);
+                
+                writeStateToDisk();
+                evaluateAndRenderView();
+                input.value = '';
+            }
+        }
+
+        function commitExpenseLog() {
+            const titleInput = document.getElementById('expense-title');
+            const costInput = document.getElementById('expense-cost');
+            const groupSelect = document.getElementById('expense-group');
+
+            const txt = titleInput.value.trim();
+            const numStr = costInput.value.trim();
+
+            if(txt === '' || numStr === '') return;
+            const numericCost = Math.floor(Number(numStr));
+
+            if(!isNaN(numericCost) && numericCost > 0) {
+                globalDatabase.months[globalDatabase.activeMonth].expenses.push({
+                    uid: Date.now() + Math.random(),
+                    title: txt,
+                    cost: numericCost,
+                    category: groupSelect.value
+                });
+
+                writeStateToDisk();
+                evaluateAndRenderView();
+                
+                titleInput.value = '';
+                costInput.value = '';
+                titleInput.focus();
+            }
+        }
+
+        function deleteExpenseFromContext(targetUID) {
+            let activeExpenses = globalDatabase.months[globalDatabase.activeMonth].expenses;
+            globalDatabase.months[globalDatabase.activeMonth].expenses = activeExpenses.filter(i => i.uid !== targetUID);
+            writeStateToDisk();
+            evaluateAndRenderView();
+        }
+
+        /* DATA RESET ENGINE SUB-FUNCTIONS */
+        function clearCurrentMonthSandbox() {
+            // Isolates and clears data variables only within active session boundaries
+            let currentContext = globalDatabase.months[globalDatabase.activeMonth];
+            
+            // Deduct active period vault configurations from rolling cumulative global master vault
+            globalDatabase.vaultTotal -= currentContext.vaultAllocations;
+            
+            // Re-zero localized boundaries safely
+            currentContext.income = 0;
+            currentContext.expenses = [];
+            currentContext.vaultAllocations = 0;
+            
+            writeStateToDisk();
+            evaluateAndRenderView();
+        }
+
+        function executeMasterGlobalReset() {
+            // Trigger systematic baseline execution confirmation
+            const verification = confirm("Warning: You are executing a master reset. This will wipe out all testing logs, all months, and completely drain the Imperial Vault memory banks back to 0 PKR. Proceed?");
+            if (verification) {
+                globalDatabase = JSON.parse(JSON.stringify(baselineDefaultDatabase));
+                writeStateToDisk();
+                syncMonthDropdownOptions();
+                evaluateAndRenderView();
+            }
+        }
+
+        function evaluateAndRenderView() {
+            const monthContext = globalDatabase.months[globalDatabase.activeMonth];
+            
+            const periodSalary = monthContext.income;
+            const operationalOutflowsSum = monthContext.expenses.reduce((s, c) => s + c.cost, 0);
+            const remainingLiquidBudget = periodSalary - operationalOutflowsSum - monthContext.vaultAllocations;
+
+            // Direct UI Metric Updating Bounds
+            document.getElementById('sum-inflow').innerText = periodSalary.toLocaleString() + ' PKR';
+            document.getElementById('sum-outflow').innerText = (operationalOutflowsSum + monthContext.vaultAllocations).toLocaleString() + ' PKR';
+            document.getElementById('sum-net').innerText = remainingLiquidBudget.toLocaleString() + ' PKR';
+            document.getElementById('sum-vault').innerText = globalDatabase.vaultTotal.toLocaleString() + ' PKR';
+
+            // Available budget coloring configuration switches
+            const budgetText = document.getElementById('sum-net');
+            if(remainingLiquidBudget < 0) { budgetText.style.color = '#f43f5e'; }
+            else if(remainingLiquidBudget > 0) { budgetText.style.color = '#22d3ee'; }
+            else { budgetText.style.color = '#94a3b8'; }
+
+            // Projection Row Computations Mapping
+            document.getElementById('row-m-report').innerText = remainingLiquidBudget.toLocaleString() + ' PKR';
+            document.getElementById('row-q-report').innerText = (remainingLiquidBudget * 3).toLocaleString() + ' PKR';
+            document.getElementById('row-s-report').innerText = (remainingLiquidBudget * 6).toLocaleString() + ' PKR';
+            document.getElementById('row-a-report').innerText = (remainingLiquidBudget * 12).toLocaleString() + ' PKR';
+
+            // Process Advisory System Rules
+            processAdvisoryLogicSystem(periodSalary, operationalOutflowsSum, remainingLiquidBudget, monthContext);
+
+            // Re-draw ledger registry data
+            const body = document.getElementById('registry-table-body');
+            body.innerHTML = '';
+
+            if(monthContext.expenses.length === 0 && monthContext.vaultAllocations === 0) {
+                body.innerHTML = `<tr><td colspan=\"4\" style=\"text-align:center; padding:32px; color:#475569; font-size:12px; font-weight:500;\">Active monthly period selection contains zero logged data rows. Ensure values are entered above.</td></tr>`;
+                return;
+            }
+
+            if(monthContext.vaultAllocations > 0) {
+                const vaultRow = document.createElement('tr');
+                vaultRow.style.background = 'rgba(217,119,6,0.02)';
+                vaultRow.innerHTML = `
+                    <td style="font-weight:700; color:#fbbf24;">Secured Capital Redirection Vault Allocation</td>
+                    <td><span class="tag" style="background:rgba(217,119,6,0.15); color:#fde68a; border-color:rgba(217,119,6,0.3);">VAULT</span></td>
+                    <td style="text-align:right; font-family:monospace; font-weight:800; color:#fbbf24;">${monthContext.vaultAllocations.toLocaleString()} PKR</td>
+                    <td style="text-align:center; color:#475569; font-size:11px; font-style:italic;">Vaulted</td>
+                `;
+                body.appendChild(vaultRow);
+            }
+
+            monthContext.expenses.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:600; color:#f8fafc;">${row.title}</td>
+                    <td><span class="tag t-${row.category.toLowerCase()}">${row.category}</span></td>
+                    <td style="text-align:right; font-family:monospace; font-weight:700; color:#e2e8f0;">${row.cost.toLocaleString()} PKR</td>
+                    <td style="text-align:center;"><button class="clear-action" onclick="deleteExpenseFromContext(${row.uid})">Remove</button></td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        function processAdvisoryLogicSystem(salary, totalOut, safeNet, context) {
+            const container = document.getElementById('advice-output-panel');
+            container.innerHTML = '';
+
+            if (salary === 0) {
+                container.innerHTML = `<div style="font-size:12px; color:#475569; padding:12px; background:rgba(0,0,0,0.2); border-radius:10px; border:1px dashed #25254a; text-align:center; margin-top:20px;">System metrics asleep. Define resource metrics for ${globalDatabase.activeMonth} to awake advisor loop.</div>`;
+                return;
+            }
+
+            let perfumeHits = context.expenses.filter(i => i.title.toLowerCase().includes('perfume') || i.title.toLowerCase().includes('cologne')).length;
+            let finalAdviceHTML = '';
+
+            if (safeNet < 0) {
+                finalAdviceHTML += `<div class="advice-msg msg-danger"><strong>⚠️ Over-Allocation Fault:</strong> Total month outflow paths exceed active period intakes by ${Math.abs(safeNet).toLocaleString()} PKR. Restrict lifestyle logging rows.</div>`;
+            } else if (safeNet < (salary * 0.15)) {
+                finalAdviceHTML += `<div class="advice-msg msg-warning"><strong>⚠️ Compression Alert:</strong> Free disposable liquid margins are hovering beneath 15%. Direct additional remaining margins to the Vault.</div>`;
+            } else {
+                finalAdviceHTML += `<div class="advice-msg msg-stable"><strong>✓ Capital Vector Balanced:</strong> Active period operations match secure geometric scaling requirements perfectly.</div>`;
+            }
+
+            if (context.vaultAllocations > 0) {
+                finalAdviceHTML += `
+                    <div class="advice-msg msg-insight" style="background:rgba(217,119,6,0.08); border-color:rgba(217,119,6,0.25); color:#fde68a;">
+                        🔒 **Vault System Active:** A total magnitude of <strong>${context.vaultAllocations.toLocaleString()} PKR</strong> has been removed from active spending pipelines for this period. This capital is isolated out of your available risk paths.
+                    </div>`;
+            }
+
+            if (perfumeHits >= 2) {
+                finalAdviceHTML += `
+                    <div class="advice-msg msg-insight">
+                        💡 **Asset Allocation Matrix Suggestion:** Systems intercept multiple grooming purchases inside ${globalDatabase.activeMonth}. Shifting this duplicate lifestyle liquidity directly to the Imperial Vault safely clears capital tracking lines for foundational structural items next quarter.
+                    </div>`;
+            }
+
+            container.innerHTML = finalAdviceHTML;
+        }
+    </script>
+</body>
+</html>
